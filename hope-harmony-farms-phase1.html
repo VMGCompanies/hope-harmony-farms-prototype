@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hope & Harmony Farms — USDA Grant & Subsidy Prospecting ADE</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+    html, body, #root { height: 100%; margin: 0; padding: 0; background: #FFFFFF; color: #1F1A14; }
+
+    .font-serif { font-family: 'Lora', Georgia, 'Times New Roman', serif; }
+
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #D4CBBD; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6B5E4D; }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+    @keyframes pulseRing {
+      0% { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 0; transform: scale(2.2); }
+    }
+    @keyframes feedSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes rowSlideIn {
+      from { opacity: 0; transform: translateY(-12px); border-left-color: #C8973F; }
+      to { opacity: 1; transform: translateY(0); border-left-color: transparent; }
+    }
+    @keyframes goldFlash {
+      0% { border-left-color: #C8973F; background: rgba(200,151,63,0.04); }
+      100% { border-left-color: transparent; background: transparent; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 800px; }
+    }
+    @keyframes amberBarSlide {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+    .pulse-ring {
+      position: absolute; inset: -3px; border-radius: 50%;
+      border: 2px solid #C8973F; animation: pulseRing 2s ease-out infinite;
+    }
+    .feed-slide { animation: feedSlide 0.3s ease-out forwards; }
+    .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+    .row-slide-in { animation: rowSlideIn 0.4s ease-out forwards, goldFlash 2s ease-out forwards; }
+    .amber-bar-slide { animation: amberBarSlide 0.3s ease-out forwards; }
+
+    .toggle-track {
+      width: 52px; height: 28px; border-radius: 14px; cursor: pointer;
+      transition: background 0.2s ease; position: relative;
+    }
+    .toggle-track.on { background: #C8973F; }
+    .toggle-track.off { background: #D4CBBD; }
+    .toggle-thumb {
+      width: 22px; height: 22px; border-radius: 50%; background: #fff;
+      position: absolute; top: 3px; transition: left 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .toggle-track.on .toggle-thumb { left: 27px; }
+    .toggle-track.off .toggle-thumb { left: 3px; }
+
+    .mini-toggle {
+      width: 32px; height: 18px; border-radius: 9px; cursor: pointer;
+      transition: background 0.2s ease; position: relative; flex-shrink: 0;
+    }
+    .mini-toggle.on { background: #6B7F5C; }
+    .mini-toggle.off { background: #D4CBBD; }
+    .mini-toggle.locked { background: #EDE6D9; cursor: not-allowed; }
+    .mini-toggle-thumb {
+      width: 14px; height: 14px; border-radius: 50%; background: #fff;
+      position: absolute; top: 2px; transition: left 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    }
+    .mini-toggle.on .mini-toggle-thumb { left: 16px; }
+    .mini-toggle.off .mini-toggle-thumb { left: 2px; }
+    .mini-toggle.locked .mini-toggle-thumb { left: 2px; }
+
+    .kpi-card {
+      border: 1px solid #EDE6D9; border-radius: 8px; background: #FAF8F4;
+      padding: 20px 24px; transition: border-color 0.2s ease;
+    }
+    .kpi-card:hover { border-color: #D4CBBD; }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.02em; text-transform: uppercase;
+    }
+
+    .opp-row {
+      border: 1px solid #EDE6D9; border-left: 3px solid transparent;
+      border-radius: 6px; background: #FFFFFF;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      cursor: pointer;
+    }
+    .opp-row:hover { border-color: #D4CBBD; background: #FDFCFA; }
+
+    .tab-btn {
+      padding: 8px 16px; font-size: 12px; font-weight: 500; cursor: pointer;
+      border-bottom: 2px solid transparent; color: #6B5E4D;
+      transition: all 0.15s ease; background: none; border-top: none;
+      border-left: none; border-right: none;
+    }
+    .tab-btn:hover { color: #3D2817; }
+    .tab-btn.active { color: #3D2817; border-bottom-color: #C8973F; }
+
+    .source-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+    .source-dot.healthy { background: #5B7A4A; }
+    .source-dot.warning { background: #C8973F; }
+    .source-dot.offline { background: #D4CBBD; }
+
+    .expansion-tile {
+      border: 1px dashed #D4CBBD; border-radius: 8px; background: #FDFCFA;
+      padding: 24px; opacity: 0.7; transition: all 0.2s ease;
+    }
+    .expansion-tile:hover { opacity: 1; border-style: solid; border-color: #C8973F; }
+
+    .check-line { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; }
+    .check-icon { flex-shrink: 0; margin-top: 2px; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'hh-brown': '#3D2817',
+            'hh-gold': '#C8973F',
+            'hh-sage': '#6B7F5C',
+            'hh-terra': '#B85C3A',
+            'hh-paper': '#FAF8F4',
+            'hh-border': '#EDE6D9',
+            'hh-text': '#1F1A14',
+            'hh-muted': '#6B5E4D',
+            'hh-success': '#5B7A4A',
+            'hh-warn': '#C8973F',
+            'hh-danger': '#B04A28',
+            'hh-info': '#5C7A8A',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, useMemo } = React;
+    const { LineChart, Line, AreaChart, Area, ResponsiveContainer, Tooltip: RechartsTooltip } = Recharts;
+
+    // ─── ICON COMPONENTS ────────────────────────────────────────────────
+    const Icon = ({ d, size = 16, color = 'currentColor', strokeWidth = 1.5, ...props }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
+        strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+        {typeof d === 'string' ? <path d={d} /> : d}
+      </svg>
+    );
+
+    const Icons = {
+      Bell: (p) => <Icon {...p} d={<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>} />,
+      ChevronDown: (p) => <Icon {...p} d="M6 9l6 6 6-6" />,
+      ChevronRight: (p) => <Icon {...p} d="M9 18l6-6-6-6" />,
+      ChevronUp: (p) => <Icon {...p} d="M18 15l-6-6-6 6" />,
+      Search: (p) => <Icon {...p} d={<><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></>} />,
+      Shield: (p) => <Icon {...p} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+      Clock: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></>} />,
+      Check: (p) => <Icon {...p} d="M20 6L9 17l-5-5" />,
+      AlertTriangle: (p) => <Icon {...p} d={<><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>} />,
+      FileText: (p) => <Icon {...p} d={<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></>} />,
+      Activity: (p) => <Icon {...p} d="M22 12h-4l-3 9L9 3l-3 9H2" />,
+      BarChart: (p) => <Icon {...p} d={<><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></>} />,
+      Globe: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>} />,
+      Zap: (p) => <Icon {...p} d="M13 2L3 14h9l-1 10 10-12h-9l1-10z" />,
+      Lock: (p) => <Icon {...p} d={<><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>} />,
+      Truck: (p) => <Icon {...p} d={<><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></>} />,
+      Droplet: (p) => <Icon {...p} d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />,
+      DollarSign: (p) => <Icon {...p} d={<><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>} />,
+      Users: (p) => <Icon {...p} d={<><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>} />,
+      Calendar: (p) => <Icon {...p} d={<><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>} />,
+      TrendingUp: (p) => <Icon {...p} d={<><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></>} />,
+      ArrowUpRight: (p) => <Icon {...p} d={<><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></>} />,
+      Eye: (p) => <Icon {...p} d={<><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>} />,
+      Settings: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></>} />,
+      Database: (p) => <Icon {...p} d={<><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></>} />,
+      Cpu: (p) => <Icon {...p} d={<><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></>} />,
+      ExternalLink: (p) => <Icon {...p} d={<><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></>} />,
+      Minus: (p) => <Icon {...p} d={<line x1="5" y1="12" x2="19" y2="12"/>} />,
+      X: (p) => <Icon {...p} d={<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>} />,
+      Info: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></>} />,
+    };
+
+    // ─── DATA ───────────────────────────────────────────────────────────
+    const OPPORTUNITIES = [
+      { id: 1, name: 'USDA Value-Added Producer Grant (VAPG)', agency: 'USDA Rural Development', status: 'Ready for Review', maxAward: 250000, matchScore: 96, deadline: '2026-06-15', complexity: 'High', awardRate: 30, fit: 'New peanut processing facility is a textbook VAPG case — demonstrates measurable value-add with +40% margin on processed goods. 4th-generation producer status strengthens narrative.', category: 'Federal' },
+      { id: 2, name: 'Rural Energy for America Program (REAP)', agency: 'USDA Rural Development', status: 'Drafting', maxAward: 500000, matchScore: 88, deadline: '2026-09-30', complexity: 'High', awardRate: 25, fit: 'Processing facility energy retrofit qualifies for up to 50% of project cost. Wakefield, VA location in eligible rural area confirmed.', category: 'Federal' },
+      { id: 3, name: 'Environmental Quality Incentives Program (EQIP)', agency: 'NRCS', status: 'Identified', maxAward: 450000, matchScore: 82, deadline: '2026-07-18', complexity: 'Medium', awardRate: 45, fit: 'Cost-share for conservation practices on ~2,400 acres of peanut and cotton rotation. Water management infrastructure qualifies.', category: 'Federal' },
+      { id: 4, name: 'Conservation Stewardship Program (CSP)', agency: 'NRCS', status: 'Identified', maxAward: 200000, matchScore: 79, deadline: '2026-08-01', complexity: 'Medium', awardRate: 40, fit: 'Existing conservation practices on Virginia peanut acreage can be enhanced. Annual payments for 5-year contract.', category: 'Federal' },
+      { id: 5, name: 'Agriculture Risk Coverage (ARC-CO) — Peanut', agency: 'FSA', status: 'Submitted', maxAward: 125000, matchScore: 94, deadline: '2026-03-15', complexity: 'Low', awardRate: 85, fit: 'County-level revenue protection for peanut base acres. Sussex County peanut yields historically trigger ARC payments.', category: 'Federal' },
+      { id: 6, name: 'Noninsured Crop Disaster Assistance (NAP)', agency: 'FSA', status: 'Submitted', maxAward: 60000, matchScore: 74, deadline: '2026-01-31', complexity: 'Low', awardRate: 90, fit: 'Catastrophic coverage for crops not covered by standard RMA policies. Low-cost risk mitigation for specialty peanut varieties.', category: 'Federal' },
+      { id: 7, name: 'Specialty Crop Block Grant (via VDACS)', agency: 'VDACS / USDA AMS', status: 'Drafting', maxAward: 75000, matchScore: 85, deadline: '2026-05-30', complexity: 'Medium', awardRate: 35, fit: 'Virginia-specific allocation for specialty crop market development. Gourmet peanut product line and Virginia Grown certification position well.', category: 'State' },
+      { id: 8, name: 'Agriculture & Forestry Industries Development (AFID) Facility Grant', agency: 'VDACS', status: 'Ready for Review', maxAward: 100000, matchScore: 91, deadline: '2026-07-01', complexity: 'Medium', awardRate: 50, fit: 'Virginia program for ag processing facility investment. New peanut processing line directly qualifies. Requires locality match — Sussex County confirmed partner.', category: 'State' },
+      { id: 9, name: 'Virginia Farmland Preservation Cost-Share', agency: 'Virginia DCR', status: 'Identified', maxAward: 40000, matchScore: 65, deadline: '2026-10-15', complexity: 'Low', awardRate: 60, fit: 'Cost-share for conservation easements on productive farmland. Long-term land preservation aligned with multi-generational operation.', category: 'State' },
+      { id: 10, name: 'Local Agriculture Market Program (LAMP)', agency: 'USDA AMS', status: 'Identified', maxAward: 100000, matchScore: 77, deadline: '2026-08-22', complexity: 'Medium', awardRate: 28, fit: 'Supports local and regional food marketing. Direct-to-consumer peanut product sales and farmers market presence qualify.', category: 'Federal' },
+      { id: 11, name: 'Climate-Smart Commodities Partnership', agency: 'USDA', status: 'Drafting', maxAward: 200000, matchScore: 83, deadline: '2026-06-30', complexity: 'High', awardRate: 20, fit: 'Pilot payments for climate-smart production practices. Peanut nitrogen fixation and cover cropping in rotation demonstrate climate benefit.', category: 'Federal' },
+      { id: 12, name: 'SBA 7(a) Rural Business Loan Guaranty', agency: 'SBA', status: 'Identified', maxAward: 350000, matchScore: 72, deadline: 'Rolling', complexity: 'High', awardRate: 65, fit: 'Guaranteed loan for rural business expansion. Processing facility capital improvements and working capital needs align.', category: 'Federal' },
+      { id: 13, name: 'Farm Storage Facility Loan (FSFL)', agency: 'FSA', status: 'Submitted', maxAward: 500000, matchScore: 90, deadline: 'Rolling', complexity: 'Low', awardRate: 80, fit: 'Low-interest loan for peanut drying and storage infrastructure. Direct fit for on-farm storage upgrades and moisture management equipment.', category: 'Federal' },
+      { id: 14, name: 'Tobacco Region Revitalization Commission Agribusiness Grant', agency: 'Virginia TRRC', status: 'Awarded', maxAward: 75000, matchScore: 87, deadline: '2026-04-01', complexity: 'Medium', awardRate: 40, fit: 'Sussex County is in eligible tobacco region. Value-added agricultural processing and job creation in rural Virginia match program priorities.', category: 'State' },
+      { id: 15, name: 'Pandemic Assistance Revenue Program (PARP) — Closeout', agency: 'FSA', status: 'Submitted', maxAward: 45000, matchScore: 68, deadline: '2026-02-28', complexity: 'Low', awardRate: 75, fit: 'Final closeout filings for pandemic-era revenue losses. ADE identified unclaimed eligible periods in 2020-2021 production years.', category: 'Federal' },
+      { id: 16, name: 'Specialty Food Association Member Grants', agency: 'SFA', status: 'Identified', maxAward: 25000, matchScore: 71, deadline: '2026-09-01', complexity: 'Low', awardRate: 45, fit: 'Member grants for specialty food producers. Virginia\'s Finest certified product line and SFA membership status confirmed.', category: 'Private' },
+      { id: 17, name: 'SARE Producer Grant (Sustainable Agriculture)', agency: 'USDA SARE', status: 'Identified', maxAward: 30000, matchScore: 73, deadline: '2026-04-15', complexity: 'Medium', awardRate: 22, fit: 'On-farm research grant for sustainable practices. Peanut-cotton rotation optimization and reduced tillage trials align with program goals.', category: 'Federal' },
+      { id: 18, name: 'Emergency Conservation Program (ECP)', agency: 'FSA', status: 'Awarded', maxAward: 200000, matchScore: 92, deadline: 'Event-based', complexity: 'Low', awardRate: 70, fit: 'Cost-share for farmland restoration after natural disasters. Previous hurricane damage to drainage infrastructure qualifies for recovery funding.', category: 'Federal' },
+      { id: 19, name: 'Organic Certification Cost Share', agency: 'USDA AMS', status: 'Ineligible', maxAward: 8000, matchScore: 22, deadline: '2026-10-31', complexity: 'Low', awardRate: 85, fit: 'Currently ineligible — Hope & Harmony is not USDA Organic certified. Flagged for tracking if organic product line is pursued in future.', category: 'Federal' },
+      { id: 20, name: 'Virginia Grown Marketing Co-op Fund', agency: 'VDACS', status: 'Drafting', maxAward: 15000, matchScore: 89, deadline: '2026-05-15', complexity: 'Low', awardRate: 55, fit: 'Marketing co-op funds for Virginia Grown certified producers. Active Virginia Grown certification and direct-to-consumer retail presence confirmed.', category: 'State' },
+      { id: 21, name: 'Regional Conservation Partnership Program (RCPP)', agency: 'NRCS', status: 'Identified', maxAward: 300000, matchScore: 76, deadline: '2026-11-01', complexity: 'High', awardRate: 18, fit: 'Multi-partner conservation program. Chesapeake Bay watershed location and existing NRCS relationship position for partner-led project inclusion.', category: 'Federal' },
+      { id: 22, name: 'Farm Operating Microloan', agency: 'FSA', status: 'Submitted', maxAward: 50000, matchScore: 81, deadline: 'Rolling', complexity: 'Low', awardRate: 75, fit: 'Streamlined operating loan up to $50K. Seasonal working capital for peanut planting inputs and harvest labor costs.', category: 'Federal' },
+    ];
+
+    const KPI_SPARKLINES = {
+      capital: [320,410,380,520,640,710,680,820,950,1100,1280,1420,1510,1680,1847],
+      submitted: [120,95,180,210,260,320,310,380,420,445,470,460,488,485,487],
+      awarded: [12,18,24,24,42,42,65,65,98,98,142,142,185,206,206],
+      hours: [18,38,56,78,98,120,140,162,184,208,230,254,278,298,318],
+    };
+
+    const ACTIVITY_FEED = [
+      { time: '11:42:18', action: 'Cross-referenced VAPG draft against 2024 awarded narratives — 3 structural gaps identified and patched' },
+      { time: '11:41:55', action: 'Pulled new RFA from VDACS portal — AFID Facility Grant deadline confirmed July 1, 2026' },
+      { time: '11:40:32', action: 'Refreshed FSA county yield data for Sussex County — ARC-CO benchmark updated' },
+      { time: '11:39:14', action: 'Scanned National Peanut Board quarterly bulletin — no new funding programs detected' },
+      { time: '11:37:48', action: 'Completed eligibility pre-screen for RCPP — 8 of 12 criteria met, 4 require documentation' },
+      { time: '11:36:02', action: 'Generated budget justification template for REAP application — energy audit data integrated' },
+      { time: '11:34:19', action: 'Verified Virginia Grown certification status — active through December 2026' },
+      { time: '11:32:45', action: 'Indexed 14 new documents from USDA Rural Development resource library' },
+    ];
+
+    const SOURCES = {
+      Federal: [
+        { name: 'USDA Rural Development', abbr: 'USDA RD', lastScan: '11:41:55', health: 'healthy' },
+        { name: 'Farm Service Agency', abbr: 'FSA', lastScan: '11:40:32', health: 'healthy' },
+        { name: 'Natural Resources Conservation Service', abbr: 'NRCS', lastScan: '11:37:48', health: 'healthy' },
+        { name: 'USDA Agricultural Marketing Service', abbr: 'AMS', lastScan: '11:35:12', health: 'healthy' },
+        { name: 'Small Business Administration', abbr: 'SBA', lastScan: '11:30:44', health: 'healthy' },
+        { name: 'Risk Management Agency', abbr: 'RMA', lastScan: '11:28:18', health: 'healthy' },
+        { name: 'USDA SARE Program', abbr: 'SARE', lastScan: '11:25:03', health: 'healthy' },
+        { name: 'Grants.gov Federal Registry', abbr: 'Grants.gov', lastScan: '11:42:01', health: 'healthy' },
+        { name: 'SAM.gov Assistance Listings', abbr: 'SAM.gov', lastScan: '11:38:22', health: 'healthy' },
+      ],
+      State: [
+        { name: 'Virginia Dept. of Agriculture & Consumer Services', abbr: 'VDACS', lastScan: '11:41:55', health: 'healthy' },
+        { name: 'Virginia Tobacco Region Revitalization Commission', abbr: 'TRRC', lastScan: '11:33:10', health: 'healthy' },
+        { name: 'Virginia FAIRS Program', abbr: 'VA FAIRS', lastScan: '11:29:45', health: 'healthy' },
+        { name: 'GO Virginia', abbr: 'GO VA', lastScan: '11:27:30', health: 'warning' },
+        { name: 'Virginia Dept. of Conservation & Recreation', abbr: 'VA DCR', lastScan: '11:24:18', health: 'healthy' },
+        { name: 'Virginia Agricultural Council', abbr: 'VAC', lastScan: '11:22:05', health: 'healthy' },
+      ],
+      'Private / Industry': [
+        { name: 'Specialty Food Association', abbr: 'SFA', lastScan: '11:20:44', health: 'healthy' },
+        { name: 'American Peanut Council', abbr: 'APC', lastScan: '11:18:30', health: 'healthy' },
+        { name: 'National Peanut Board', abbr: 'NPB', lastScan: '11:39:14', health: 'healthy' },
+        { name: 'Virginia Peanut Growers Association', abbr: 'VPGA', lastScan: '11:16:22', health: 'healthy' },
+        { name: 'Virginia Farm Bureau', abbr: 'VFB', lastScan: '11:14:08', health: 'healthy' },
+        { name: 'National Peanut Buying Points Association', abbr: 'NPBPA', lastScan: '11:12:55', health: 'healthy' },
+      ],
+    };
+
+    const CALENDAR_EVENTS = [
+      { date: '2026-05-15', program: 'Virginia Grown Marketing Co-op Fund', urgency: 'high', oppId: 20 },
+      { date: '2026-05-30', program: 'Specialty Crop Block Grant (VDACS)', urgency: 'high', oppId: 7 },
+      { date: '2026-06-15', program: 'USDA VAPG — Application due', urgency: 'critical', oppId: 1 },
+      { date: '2026-06-30', program: 'Climate-Smart Commodities Partnership', urgency: 'medium', oppId: 11 },
+      { date: '2026-07-01', program: 'AFID Facility Grant — Application due', urgency: 'medium', oppId: 8 },
+      { date: '2026-07-18', program: 'EQIP — Application window closes', urgency: 'medium', oppId: 3 },
+      { date: '2026-08-01', program: 'CSP — Enrollment deadline', urgency: 'low', oppId: 4 },
+      { date: '2026-08-22', program: 'LAMP — Application due', urgency: 'low', oppId: 10 },
+    ];
+
+    const ELIGIBILITY_CHECKS = [
+      { label: 'Operation located in eligible rural census tract', detail: 'Verified Wakefield, VA 23888 — Sussex County qualifies under RD rural area designation', status: 'pass', source: 'Census Bureau / USDA RD Eligibility Map', timestamp: '2026-04-28 09:14:22' },
+      { label: 'Value-added processing demonstrated', detail: 'Peanut roasting and flavoring facility on file — transforms raw commodity into consumer product', status: 'pass', source: 'H&H operational records / VDACS facility registration', timestamp: '2026-04-28 09:14:25' },
+      { label: 'Independent producer status confirmed', detail: 'Hope & Harmony Farms operates as independent producer — not a subsidiary or cooperative member', status: 'pass', source: 'Virginia SCC business filing / SAM.gov registration', timestamp: '2026-04-28 09:14:28' },
+      { label: 'Majority of raw materials self-produced', detail: 'Confirmed >50% of peanuts processed are grown on owned/leased acreage (~2,400 acres)', status: 'pass', source: 'FSA acreage reports / H&H production records', timestamp: '2026-04-28 09:14:30' },
+      { label: 'Market expansion or new market entry documented', detail: 'E-commerce launch and regional retail distribution expansion qualify as new market entry', status: 'pass', source: 'H&H sales records / hopeandharmonyfarms.com', timestamp: '2026-04-28 09:14:33' },
+      { label: 'Business plan with financial projections on file', detail: 'Current business plan dated February 2026 — includes 3-year revenue projections', status: 'pass', source: 'H&H internal documents', timestamp: '2026-04-28 09:14:35' },
+      { label: 'Three-year financial statements available', detail: 'Last reviewed 2024-11 — recommend refresh with 2025 actuals before submission', status: 'warn', source: 'H&H financial records', timestamp: '2026-04-28 09:14:38' },
+      { label: 'No delinquent federal debt', detail: 'SAM.gov registration active — no exclusions or delinquencies flagged', status: 'pass', source: 'SAM.gov', timestamp: '2026-04-28 09:14:40' },
+      { label: 'Matching funds commitment documented', detail: 'Pending owner confirmation — VAPG requires 1:1 match or in-kind contribution', status: 'warn', source: 'Awaiting owner input', timestamp: '2026-04-28 09:14:42' },
+      { label: 'DUNS/UEI number registered and active', detail: 'Unique Entity ID confirmed active in SAM.gov — registration current through 2027', status: 'pass', source: 'SAM.gov', timestamp: '2026-04-28 09:14:44' },
+    ];
+
+    const DRAFT_SECTIONS = [
+      { name: 'Executive Summary', pct: 98, status: 'complete' },
+      { name: 'Project Narrative', pct: 94, status: 'review' },
+      { name: 'Work Plan & Timeline', pct: 87, status: 'review' },
+      { name: 'Budget Justification', pct: 71, status: 'drafting' },
+      { name: 'Match Funding Documentation', pct: 15, status: 'pending' },
+      { name: 'Letters of Support', pct: 0, status: 'pending' },
+      { name: 'Organizational Documents', pct: 60, status: 'drafting' },
+    ];
+
+    const DRAFT_NARRATIVE = `Hope & Harmony Farms, a fourth-generation family operation in Wakefield, Virginia, proposes to expand its value-added peanut processing capacity through the acquisition and installation of an automated roasting and flavoring line at its existing processing facility. The proposed project will enable the operation to process an additional 840,000 pounds of raw Virginia-type peanuts annually into branded, consumer-ready products — including honey-roasted, sea-salted, and specialty-flavored varieties sold under the Hope & Harmony label.
+
+The project directly addresses VAPG priorities by transforming a raw agricultural commodity into differentiated, shelf-stable consumer products with demonstrated market demand. Current production capacity constraints have resulted in $312,000 in unfulfilled wholesale orders in the trailing twelve months. The proposed expansion will capture this unmet demand while opening new distribution channels, including regional grocery chains and e-commerce fulfillment, projecting a 40% increase in gross margin per pound processed.`;
+
+    const ACTIVITY_LOG = [
+      { time: '2026-04-30 11:42:18', action: 'Cross-referenced VAPG draft narrative against 3 awarded 2024 applications — identified structural improvements in impact metrics section' },
+      { time: '2026-04-30 11:38:04', action: 'Updated budget justification with revised equipment quotes from Perry Equipment Co.' },
+      { time: '2026-04-29 16:22:10', action: 'Generated initial project narrative draft — confidence: 91%' },
+      { time: '2026-04-29 14:15:33', action: 'Completed full eligibility pre-screen — 8/10 criteria passed, 2 require owner documentation' },
+      { time: '2026-04-28 09:14:22', action: 'Initiated VAPG opportunity — source: Grants.gov RFA posted April 25, 2026' },
+      { time: '2026-04-28 09:12:05', action: 'Matched VAPG eligibility criteria to Hope & Harmony operational profile — score: 96/100' },
+      { time: '2026-04-27 11:30:00', action: 'Indexed VAPG program documentation — 47 pages, 12 appendices catalogued' },
+    ];
+
+    const AWARD_HISTORY = [
+      { year: 2025, program: 'EQIP Conservation Practice', amount: 42800, status: 'Awarded', entity: 'Hope & Harmony Farms' },
+      { year: 2024, program: 'Tobacco Region Agribusiness Grant', amount: 75000, status: 'Awarded', entity: 'Hope & Harmony Farms' },
+      { year: 2024, program: 'FSA Emergency Conservation Program', amount: 38200, status: 'Awarded', entity: 'Hope & Harmony Farms' },
+      { year: 2023, program: 'VAPG — Value-Added Producer Grant', amount: 189000, status: 'Awarded', entity: 'Comparable — VA peanut processor (anonymized)' },
+      { year: 2023, program: 'Virginia Grown Marketing Fund', amount: 12500, status: 'Awarded', entity: 'Hope & Harmony Farms' },
+      { year: 2022, program: 'REAP Energy Grant', amount: 145000, status: 'Awarded', entity: 'Comparable — VA agricultural processor (anonymized)' },
+      { year: 2024, program: 'PARP Closeout Filing', amount: 38340, status: 'Disbursed', entity: 'Hope & Harmony Farms' },
+    ];
+
+    // ─── UTILITY ────────────────────────────────────────────────────────
+    const fmt = (n) => n >= 1000 ? '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '$' + n;
+    const fmtK = (n) => n >= 1000000 ? '$' + (n/1000000).toFixed(1) + 'M' : n >= 1000 ? '$' + Math.round(n/1000) + 'K' : '$' + n;
+
+    const statusConfig = {
+      'Identified':       { bg: '#F0EDE8', text: '#6B5E4D', dot: '#6B5E4D' },
+      'Drafting':         { bg: '#FFF8EB', text: '#96701E', dot: '#C8973F' },
+      'Ready for Review': { bg: '#EBF0FF', text: '#3D5A99', dot: '#5C7A8A' },
+      'Submitted':        { bg: '#E8F0E6', text: '#3D6832', dot: '#5B7A4A' },
+      'Awarded':          { bg: '#E6F0E4', text: '#2D5A22', dot: '#3D7A2A' },
+      'Ineligible':       { bg: '#F5EDED', text: '#8A3A2A', dot: '#B04A28' },
+    };
+
+    // ─── MAIN APP ───────────────────────────────────────────────────────
+    function HopeHarmonyADE() {
+      const [autonomousMode, setAutonomousMode] = useState(true);
+      const [subToggles, setSubToggles] = useState({ sources: true, eligibility: true, drafting: true, submission: false });
+      const [expandedOpp, setExpandedOpp] = useState(null);
+      const [activeTab, setActiveTab] = useState('overview');
+      const [tickerSeconds, setTickerSeconds] = useState(3);
+      const [sweepCountdown, setSweepCountdown] = useState(240);
+      const [visibleOpps, setVisibleOpps] = useState(OPPORTUNITIES.slice(0, 8));
+      const [newRowId, setNewRowId] = useState(null);
+      const [expandedModule, setExpandedModule] = useState(null);
+      const oppPoolRef = useRef(8);
+
+      // Live ticker — seconds since last update
+      useEffect(() => {
+        if (!autonomousMode) return;
+        const i = setInterval(() => setTickerSeconds(s => s + 1), 1000);
+        return () => clearInterval(i);
+      }, [autonomousMode]);
+
+      // Sweep countdown
+      useEffect(() => {
+        if (!autonomousMode) return;
+        const i = setInterval(() => setSweepCountdown(s => s <= 1 ? 240 : s - 1), 1000);
+        return () => clearInterval(i);
+      }, [autonomousMode]);
+
+      // New opportunity injection
+      useEffect(() => {
+        if (!autonomousMode) return;
+        const i = setInterval(() => {
+          const nextIdx = oppPoolRef.current % OPPORTUNITIES.length;
+          const nextOpp = OPPORTUNITIES[nextIdx];
+          oppPoolRef.current += 1;
+          setNewRowId(nextOpp.id);
+          setVisibleOpps(prev => {
+            const filtered = prev.filter(o => o.id !== nextOpp.id);
+            return [nextOpp, ...filtered].slice(0, 16);
+          });
+          setTimeout(() => setNewRowId(null), 2000);
+        }, 12000);
+        return () => clearInterval(i);
+      }, [autonomousMode]);
+
+      const toggleSub = (key) => {
+        if (key === 'submission') return;
+        setSubToggles(prev => ({ ...prev, [key]: !prev[key] }));
+      };
+
+      const formatSweep = (s) => {
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return `${m}:${sec.toString().padStart(2, '0')}`;
+      };
+
+      const sortedOpps = useMemo(() => {
+        const order = { 'Ready for Review': 0, 'Drafting': 1, 'Identified': 2, 'Submitted': 3, 'Awarded': 4, 'Ineligible': 5 };
+        return [...visibleOpps].sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
+      }, [visibleOpps]);
+
+      return (
+        <div style={{ minHeight: '100vh', background: '#FFFFFF' }}>
+          {/* ── HEADER ─────────────────────────────────────── */}
+          <header style={{ position: 'sticky', top: 0, zIndex: 50, height: 64, background: '#FFFFFF', borderBottom: '1px solid #EDE6D9', display: 'flex', alignItems: 'center', padding: '0 32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 10, background: '#3D2817', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                <img src="https://cdn11.bigcommerce.com/s-vjtvsmbiri/images/stencil/789x489/hope_harmony_peanuts_logo_white_1601302832__86566.original.png" alt="Hope & Harmony Farms" style={{ width: 36, height: 'auto', objectFit: 'contain' }} />
+              </div>
+              <div>
+                <div className="font-serif" style={{ fontSize: 17, fontWeight: 600, color: '#3D2817', lineHeight: 1.2 }}>Hope & Harmony Farms</div>
+                <div style={{ fontSize: 10, color: '#6B5E4D', letterSpacing: '0.04em' }}>Wakefield, Virginia · Est. 4 Generations</div>
+              </div>
+            </div>
+
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+              <div style={{ fontSize: 12, color: '#6B5E4D', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Icons.BarChart size={14} color="#6B5E4D" />
+                <span>Operations Console</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              <div style={{ padding: '4px 14px', borderRadius: 20, background: '#FAF8F4', border: '1px solid #EDE6D9', fontSize: 12, fontWeight: 500, color: '#6B5E4D', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ width: 6, height: 6, borderRadius: 3, background: '#5B7A4A' }} />
+                Production Floor
+              </div>
+
+              <div style={{ position: 'relative', cursor: 'pointer' }}>
+                <Icons.Bell size={18} color="#6B5E4D" />
+                <div style={{ position: 'absolute', top: -4, right: -6, width: 16, height: 16, borderRadius: 8, background: '#C8973F', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 16, background: '#3D2817', color: '#FAF8F4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600 }}>JP</div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#1F1A14', lineHeight: 1.2 }}>Jeffrey P.</div>
+                  <div style={{ fontSize: 10, color: '#6B5E4D' }}>Owner / Operator</div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* ── AI CONTROL BAR ─────────────────────────────── */}
+          <div style={{ position: 'sticky', top: 64, zIndex: 40, height: 56, background: '#FAF8F4', borderBottom: '1px solid #EDE6D9', display: 'flex', alignItems: 'center', padding: '0 32px' }}>
+            {/* Master Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 320 }}>
+              <div className={`toggle-track ${autonomousMode ? 'on' : 'off'}`} onClick={() => setAutonomousMode(!autonomousMode)}>
+                <div className="toggle-thumb" />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  Autonomous Mode
+                  {autonomousMode && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: '#C8973F' }}>
+                      <span style={{ position: 'relative', display: 'inline-flex' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: 3, background: '#C8973F' }} className="pulse-dot" />
+                        <span className="pulse-ring" />
+                      </span>
+                      LIVE
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 10, color: '#6B5E4D' }}>
+                  {autonomousMode
+                    ? `Scanning 47 sources · updated ${tickerSeconds}s ago`
+                    : 'PAUSED — Manual review only'
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-toggles */}
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: 20 }}>
+              {[
+                { key: 'sources', label: 'Source Monitoring', sub: 'USDA, FSA, NRCS, VDACS, SBA' },
+                { key: 'eligibility', label: 'Eligibility Matching', sub: null },
+                { key: 'drafting', label: 'Application Auto-Drafting', sub: null },
+                { key: 'submission', label: 'Submission', sub: 'Requires owner approval', locked: true },
+              ].map(t => (
+                <div key={t.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }} title={t.locked ? 'Requires owner approval per build spec' : ''}>
+                  <div className={`mini-toggle ${t.locked ? 'locked' : (subToggles[t.key] && autonomousMode) ? 'on' : 'off'}`}
+                    onClick={() => !t.locked && autonomousMode && toggleSub(t.key)}>
+                    <div className="mini-toggle-thumb" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 500, color: t.locked ? '#A09585' : '#1F1A14', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      {t.label}
+                      {t.locked && <Icons.Lock size={10} color="#A09585" />}
+                    </div>
+                    {t.sub && <div style={{ fontSize: 9, color: '#A09585' }}>{t.sub}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Sweep info */}
+            <div style={{ minWidth: 200, textAlign: 'right' }}>
+              <div style={{ fontSize: 11, color: '#6B5E4D' }}>Last full sweep: <span style={{ fontWeight: 600 }}>11 min ago</span></div>
+              <div style={{ fontSize: 11, color: autonomousMode ? '#C8973F' : '#A09585', fontWeight: 500 }} className="tabular-nums">
+                Next sweep: {autonomousMode ? formatSweep(sweepCountdown) : '--:--'}
+              </div>
+            </div>
+          </div>
+
+          {/* ── AMBER PAUSE BAR ────────────────────────────── */}
+          {!autonomousMode && (
+            <div className="amber-bar-slide" style={{ background: '#FFF8EB', borderBottom: '1px solid #E8D5A8', padding: '8px 32px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#7A5A14' }}>
+              <Icons.AlertTriangle size={14} color="#C8973F" />
+              Autonomous mode paused. ADE is in observation-only mode. Toggle to resume.
+            </div>
+          )}
+
+          {/* ── KPI STRIP ──────────────────────────────────── */}
+          <div style={{ maxWidth: 1440, margin: '0 auto', padding: '24px 32px 0' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+              {[
+                { label: 'Capital Identified (Pipeline)', value: '$1,847,200', sub: '14 active opportunities', delta: '+$312K WoW', deltaUp: true, data: KPI_SPARKLINES.capital },
+                { label: 'Funds Submitted Awaiting Decision', value: '$487,500', sub: '6 applications', delta: null, deltaUp: null, data: KPI_SPARKLINES.submitted },
+                { label: 'Funds Awarded YTD', value: '$206,840', sub: '4 programs', delta: 'vs. $74,200 same period prior year', deltaUp: true, data: KPI_SPARKLINES.awarded },
+                { label: 'Hours Returned to Operations', value: '318 hrs', sub: 'YTD (6.1 hrs/wk baseline)', delta: null, deltaUp: null, data: KPI_SPARKLINES.hours },
+              ].map((kpi, i) => (
+                <div key={i} className="kpi-card">
+                  <div className="font-serif" style={{ fontSize: 10, fontWeight: 500, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{kpi.label}</div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                    <div>
+                      <div className="tabular-nums" style={{ fontSize: 28, fontWeight: 700, color: '#1F1A14', lineHeight: 1 }}>{kpi.value}</div>
+                      <div style={{ fontSize: 11, color: '#6B5E4D', marginTop: 4 }}>{kpi.sub}</div>
+                      {kpi.delta && (
+                        <div style={{ fontSize: 11, color: kpi.deltaUp ? '#5B7A4A' : '#B04A28', fontWeight: 500, marginTop: 2, display: 'flex', alignItems: 'center', gap: 3 }}>
+                          {kpi.deltaUp && <Icons.TrendingUp size={12} color="#5B7A4A" />}
+                          {kpi.delta}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ width: 80, height: 36 }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={kpi.data.map((v, j) => ({ v }))}>
+                          <defs>
+                            <linearGradient id={`kpiGrad${i}`} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#C8973F" stopOpacity={0.2} />
+                              <stop offset="100%" stopColor="#C8973F" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <Area type="monotone" dataKey="v" stroke="#C8973F" strokeWidth={1.5} fill={`url(#kpiGrad${i})`} dot={false} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* ── MAIN WORKSPACE ──────────────────────────── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '65fr 35fr', gap: 24, marginTop: 24, paddingBottom: 32 }}>
+
+              {/* LEFT COLUMN — Opportunity Stream */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div>
+                    <div className="font-serif" style={{ fontSize: 14, fontWeight: 600, color: '#3D2817', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Live Opportunity Stream</div>
+                    <div style={{ fontSize: 11, color: '#6B5E4D', marginTop: 2 }}>{OPPORTUNITIES.length} programs tracked · {OPPORTUNITIES.filter(o => o.status !== 'Ineligible' && o.status !== 'Awarded').length} actionable</div>
+                  </div>
+                  {autonomousMode && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#C8973F' }}>
+                      <span style={{ position: 'relative', display: 'inline-flex' }}>
+                        <span style={{ width: 5, height: 5, borderRadius: 3, background: '#C8973F' }} className="pulse-dot" />
+                      </span>
+                      Auto-updating
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {sortedOpps.map(opp => {
+                    const sc = statusConfig[opp.status] || statusConfig['Identified'];
+                    const isExpanded = expandedOpp === opp.id;
+                    const isNew = newRowId === opp.id;
+                    return (
+                      <div key={opp.id}>
+                        <div className={`opp-row ${isNew ? 'row-slide-in' : ''}`}
+                          style={{ padding: '14px 18px', borderLeftColor: isNew ? '#C8973F' : undefined }}
+                          onClick={() => { setExpandedOpp(isExpanded ? null : opp.id); setActiveTab('overview'); }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                              <span className="status-pill" style={{ background: sc.bg, color: sc.text, flexShrink: 0 }}>
+                                <span style={{ width: 5, height: 5, borderRadius: 3, background: sc.dot }} />
+                                {opp.status}
+                              </span>
+                              <div style={{ minWidth: 0, flex: 1 }}>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{opp.name}</div>
+                                <div style={{ fontSize: 11, color: '#6B5E4D', marginTop: 1 }}>{opp.agency}</div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
+                              <div style={{ textAlign: 'right' }}>
+                                <div className="tabular-nums" style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14' }}>up to {fmt(opp.maxAward)}</div>
+                                <div style={{ fontSize: 10, color: '#6B5E4D' }}>
+                                  {opp.deadline === 'Rolling' || opp.deadline === 'Event-based' ? opp.deadline : `Due ${new Date(opp.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                                </div>
+                              </div>
+                              <div style={{ width: 44, textAlign: 'center' }}>
+                                <div className="tabular-nums" style={{ fontSize: 16, fontWeight: 700, color: opp.matchScore >= 85 ? '#5B7A4A' : opp.matchScore >= 70 ? '#C8973F' : '#B04A28' }}>{opp.matchScore}</div>
+                                <div style={{ fontSize: 9, color: '#6B5E4D' }}>match</div>
+                              </div>
+                              <div style={{ width: 20, display: 'flex', justifyContent: 'center' }}>
+                                {isExpanded ? <Icons.ChevronUp size={16} color="#6B5E4D" /> : <Icons.ChevronDown size={16} color="#6B5E4D" />}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* DRILL-DOWN PANEL */}
+                        {isExpanded && (
+                          <div className="fade-in" style={{ border: '1px solid #EDE6D9', borderTop: 'none', borderRadius: '0 0 6px 6px', background: '#FDFCFA', overflow: 'hidden' }}>
+                            {/* Tabs */}
+                            <div style={{ display: 'flex', borderBottom: '1px solid #EDE6D9', padding: '0 18px', background: '#FAF8F4' }}>
+                              {['overview', 'eligibility', 'draft', 'activity', 'history'].map(tab => (
+                                <button key={tab} className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+                                  onClick={(e) => { e.stopPropagation(); setActiveTab(tab); }}>
+                                  {tab === 'overview' ? 'Overview' : tab === 'eligibility' ? 'Eligibility Match' : tab === 'draft' ? 'Draft Application' : tab === 'activity' ? 'Activity Log' : 'Award History'}
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Tab Content */}
+                            <div style={{ padding: '20px 24px', minHeight: 300 }}>
+                              {activeTab === 'overview' && (
+                                <div>
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
+                                    <div><div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Funding Source</div><div style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14', marginTop: 2 }}>{opp.agency}</div></div>
+                                    <div><div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Max Award</div><div className="tabular-nums" style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14', marginTop: 2 }}>{fmt(opp.maxAward)}</div></div>
+                                    <div><div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Historical Award Rate</div><div className="tabular-nums" style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14', marginTop: 2 }}>{opp.awardRate}%</div></div>
+                                    <div><div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Complexity</div><div style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14', marginTop: 2 }}>{opp.complexity}</div></div>
+                                  </div>
+                                  <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Why This Fits Hope & Harmony</div>
+                                  <div style={{ fontSize: 13, color: '#1F1A14', lineHeight: 1.6, padding: '12px 16px', background: '#FAF8F4', borderRadius: 6, border: '1px solid #EDE6D9' }}>{opp.fit}</div>
+                                  <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                    <div style={{ padding: '10px 14px', background: '#FAF8F4', borderRadius: 6, border: '1px solid #EDE6D9' }}>
+                                      <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Application Window</div>
+                                      <div style={{ fontSize: 12, fontWeight: 500, color: '#1F1A14', marginTop: 4 }}>{opp.deadline === 'Rolling' ? 'Rolling — accept applications continuously' : opp.deadline === 'Event-based' ? 'Event-triggered — post-disaster filing' : `Open now through ${new Date(opp.deadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`}</div>
+                                    </div>
+                                    <div style={{ padding: '10px 14px', background: '#FAF8F4', borderRadius: 6, border: '1px solid #EDE6D9' }}>
+                                      <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Typical Decision Timeline</div>
+                                      <div style={{ fontSize: 12, fontWeight: 500, color: '#1F1A14', marginTop: 4 }}>{opp.complexity === 'High' ? '90–180 days from submission' : opp.complexity === 'Medium' ? '60–120 days from submission' : '30–60 days from submission'}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {activeTab === 'eligibility' && (
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                                    <div style={{ fontSize: 12, color: '#6B5E4D' }}>Automated eligibility pre-screen for <span style={{ fontWeight: 600, color: '#1F1A14' }}>{opp.name}</span></div>
+                                    <div className="tabular-nums" style={{ fontSize: 12, fontWeight: 600, color: opp.matchScore >= 85 ? '#5B7A4A' : '#C8973F' }}>Score: {opp.matchScore}/100</div>
+                                  </div>
+                                  {ELIGIBILITY_CHECKS.map((check, i) => (
+                                    <div key={i} className="check-line" style={{ borderBottom: i < ELIGIBILITY_CHECKS.length - 1 ? '1px solid #F0EDE8' : 'none', paddingBottom: 8 }}>
+                                      <div className="check-icon">
+                                        {check.status === 'pass'
+                                          ? <Icons.Check size={14} color="#5B7A4A" />
+                                          : <Icons.AlertTriangle size={14} color="#C8973F" />
+                                        }
+                                      </div>
+                                      <div style={{ flex: 1 }}>
+                                        <div style={{ fontSize: 12, fontWeight: 500, color: '#1F1A14' }}>{check.label}</div>
+                                        <div style={{ fontSize: 11, color: '#6B5E4D', marginTop: 2 }}>{check.detail}</div>
+                                        <div style={{ fontSize: 10, color: '#A09585', marginTop: 2 }}>Source: {check.source} · {check.timestamp}</div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {activeTab === 'draft' && (
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                                    <div>
+                                      <div style={{ fontSize: 12, fontWeight: 600, color: '#1F1A14' }}>VAPG Application Draft — Rev. 3</div>
+                                      <div style={{ fontSize: 11, color: '#6B5E4D' }}>Last updated 2026-04-30 11:38:04 EST</div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 4, background: '#FFF8EB', border: '1px solid #E8D5A8' }}>
+                                      <span className="tabular-nums" style={{ fontSize: 12, fontWeight: 600, color: '#96701E' }}>Draft confidence: 88%</span>
+                                      <span style={{ fontSize: 11, color: '#96701E' }}>— recommend owner review of Section IV</span>
+                                    </div>
+                                  </div>
+
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20 }}>
+                                    {DRAFT_SECTIONS.map((sec, i) => (
+                                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', background: '#FAF8F4', borderRadius: 4, border: '1px solid #EDE6D9' }}>
+                                        <div style={{ flex: 1, fontSize: 12, fontWeight: 500, color: '#1F1A14' }}>{sec.name}</div>
+                                        <div style={{ width: 120, height: 6, borderRadius: 3, background: '#EDE6D9', overflow: 'hidden' }}>
+                                          <div style={{ width: `${sec.pct}%`, height: '100%', borderRadius: 3, background: sec.pct >= 90 ? '#5B7A4A' : sec.pct >= 50 ? '#C8973F' : '#D4CBBD', transition: 'width 0.3s ease' }} />
+                                        </div>
+                                        <div className="tabular-nums" style={{ fontSize: 11, fontWeight: 500, color: '#6B5E4D', width: 32, textAlign: 'right' }}>{sec.pct}%</div>
+                                        <span className="status-pill" style={{
+                                          fontSize: 9,
+                                          background: sec.status === 'complete' ? '#E6F0E4' : sec.status === 'review' ? '#EBF0FF' : sec.status === 'drafting' ? '#FFF8EB' : '#F0EDE8',
+                                          color: sec.status === 'complete' ? '#3D6832' : sec.status === 'review' ? '#3D5A99' : sec.status === 'drafting' ? '#96701E' : '#6B5E4D',
+                                        }}>{sec.status}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Sample — Project Narrative (Section II)</div>
+                                  <div style={{ fontSize: 12, color: '#1F1A14', lineHeight: 1.7, padding: '16px', background: '#FFFFFF', borderRadius: 6, border: '1px solid #EDE6D9', fontStyle: 'italic' }}>{DRAFT_NARRATIVE}</div>
+
+                                  <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+                                    <button style={{ padding: '8px 20px', borderRadius: 6, background: '#3D2817', color: '#FAF8F4', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer' }}>Approve & Queue for Submission</button>
+                                    <button style={{ padding: '8px 20px', borderRadius: 6, background: '#FFFFFF', color: '#3D2817', fontSize: 12, fontWeight: 500, border: '1px solid #EDE6D9', cursor: 'pointer' }}>Request Edits</button>
+                                    <button style={{ padding: '8px 20px', borderRadius: 6, background: '#FFFFFF', color: '#3D2817', fontSize: 12, fontWeight: 500, border: '1px solid #EDE6D9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                      <Icons.ExternalLink size={12} /> Open in Editor
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {activeTab === 'activity' && (
+                                <div>
+                                  <div style={{ fontSize: 12, color: '#6B5E4D', marginBottom: 12 }}>Chronological action log — all ADE actions on this opportunity</div>
+                                  {ACTIVITY_LOG.map((entry, i) => (
+                                    <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: i < ACTIVITY_LOG.length - 1 ? '1px solid #F0EDE8' : 'none' }}>
+                                      <div className="tabular-nums" style={{ fontSize: 11, color: '#A09585', whiteSpace: 'nowrap', width: 140, flexShrink: 0 }}>{entry.time}</div>
+                                      <div style={{ fontSize: 12, color: '#1F1A14', lineHeight: 1.5 }}>{entry.action}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {activeTab === 'history' && (
+                                <div>
+                                  <div style={{ fontSize: 12, color: '#6B5E4D', marginBottom: 12 }}>Prior awards — Hope & Harmony Farms and comparable Virginia peanut operations</div>
+                                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                                    <thead>
+                                      <tr style={{ borderBottom: '1px solid #EDE6D9' }}>
+                                        <th style={{ textAlign: 'left', padding: '8px 0', fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Year</th>
+                                        <th style={{ textAlign: 'left', padding: '8px 0', fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Program</th>
+                                        <th style={{ textAlign: 'right', padding: '8px 0', fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Amount</th>
+                                        <th style={{ textAlign: 'left', padding: '8px 12px', fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>Entity</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {AWARD_HISTORY.map((row, i) => (
+                                        <tr key={i} style={{ borderBottom: '1px solid #F0EDE8' }}>
+                                          <td className="tabular-nums" style={{ padding: '10px 0', fontWeight: 500 }}>{row.year}</td>
+                                          <td style={{ padding: '10px 0' }}>{row.program}</td>
+                                          <td className="tabular-nums" style={{ padding: '10px 0', textAlign: 'right', fontWeight: 600 }}>{fmt(row.amount)}</td>
+                                          <td style={{ padding: '10px 12px', color: row.entity.includes('Comparable') ? '#6B5E4D' : '#1F1A14', fontStyle: row.entity.includes('Comparable') ? 'italic' : 'normal', fontSize: 11 }}>{row.entity}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN — Stacked Panels */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                {/* Panel A: ADE Status */}
+                <div style={{ border: '1px solid #EDE6D9', borderRadius: 8, background: '#FAF8F4', overflow: 'hidden' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid #EDE6D9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 8, background: '#3D2817', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icons.Cpu size={18} color="#C8973F" />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#1F1A14' }}>Grant Prospector ADE</div>
+                        <div style={{ fontSize: 10, color: '#6B5E4D' }}>Codename: Aquila</div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 12, marginTop: 10, fontSize: 11 }}>
+                      <span style={{ color: autonomousMode ? '#5B7A4A' : '#6B5E4D', fontWeight: 500 }}>{autonomousMode ? 'Active' : 'Paused'}</span>
+                      <span style={{ color: '#A09585' }}>·</span>
+                      <span style={{ color: '#6B5E4D' }}>Tier 1 Build</span>
+                      <span style={{ color: '#A09585' }}>·</span>
+                      <span style={{ color: '#6B5E4D' }}>Deployed Day 47</span>
+                    </div>
+                  </div>
+
+                  {/* Live feed */}
+                  <div style={{ padding: '12px 20px', borderBottom: '1px solid #EDE6D9', maxHeight: 180, overflowY: 'auto' }}>
+                    <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Live Activity</div>
+                    {ACTIVITY_FEED.slice(0, 4).map((item, i) => (
+                      <div key={i} className={i === 0 && autonomousMode ? 'feed-slide' : ''} style={{ display: 'flex', gap: 8, padding: '6px 0', borderBottom: i < 3 ? '1px solid #F0EDE8' : 'none', opacity: autonomousMode ? 1 : 0.5 }}>
+                        <span className="tabular-nums" style={{ fontSize: 10, color: '#A09585', whiteSpace: 'nowrap', flexShrink: 0 }}>{item.time}</span>
+                        <span style={{ fontSize: 11, color: '#1F1A14', lineHeight: 1.4 }}>{item.action}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Knowledge & trust */}
+                  <div style={{ padding: '12px 20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 8 }}>
+                      <span style={{ color: '#6B5E4D' }}>Knowledge Base</span>
+                      <span style={{ fontWeight: 600, color: '#1F1A14' }} className="tabular-nums">1,247 documents</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 12 }}>
+                      <span style={{ color: '#6B5E4D' }}>Sources Monitored</span>
+                      <span style={{ fontWeight: 600, color: '#1F1A14' }} className="tabular-nums">47</span>
+                    </div>
+                    <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Trust Controls — Autonomy Level</div>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {['Identify Only', 'Identify + Draft', 'Full Auto'].map((level, i) => (
+                        <div key={i} style={{
+                          flex: 1, padding: '6px 0', textAlign: 'center', fontSize: 10, fontWeight: 500, borderRadius: 4, cursor: 'pointer',
+                          background: i === 1 ? '#3D2817' : '#FFFFFF',
+                          color: i === 1 ? '#FAF8F4' : '#6B5E4D',
+                          border: `1px solid ${i === 1 ? '#3D2817' : '#EDE6D9'}`,
+                        }}>{level}</div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Panel B: Source Coverage */}
+                <div style={{ border: '1px solid #EDE6D9', borderRadius: 8, background: '#FAF8F4', overflow: 'hidden' }}>
+                  <div style={{ padding: '14px 20px', borderBottom: '1px solid #EDE6D9' }}>
+                    <div className="font-serif" style={{ fontSize: 12, fontWeight: 600, color: '#3D2817', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Source Coverage</div>
+                    <div style={{ fontSize: 10, color: '#6B5E4D', marginTop: 2 }}>47 sources across federal, state, and private registries</div>
+                  </div>
+                  <div style={{ padding: '12px 20px', maxHeight: 320, overflowY: 'auto' }}>
+                    {Object.entries(SOURCES).map(([group, sources]) => (
+                      <div key={group} style={{ marginBottom: 12 }}>
+                        <div style={{ fontSize: 10, fontWeight: 600, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>{group}</div>
+                        {sources.map((src, i) => (
+                          <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0', borderBottom: i < sources.length - 1 ? '1px solid #F5F2ED' : 'none' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <div className={`source-dot ${autonomousMode && subToggles.sources ? src.health : 'offline'}`} />
+                              <span style={{ fontSize: 11, color: '#1F1A14' }}>{src.abbr}</span>
+                            </div>
+                            <span className="tabular-nums" style={{ fontSize: 10, color: autonomousMode ? '#A09585' : '#C4B9A8' }}>{src.lastScan}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Panel C: Operational Calendar */}
+                <div style={{ border: '1px solid #EDE6D9', borderRadius: 8, background: '#FAF8F4', overflow: 'hidden' }}>
+                  <div style={{ padding: '14px 20px', borderBottom: '1px solid #EDE6D9' }}>
+                    <div className="font-serif" style={{ fontSize: 12, fontWeight: 600, color: '#3D2817', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Upcoming Deadlines</div>
+                    <div style={{ fontSize: 10, color: '#6B5E4D', marginTop: 2 }}>Next 90 days</div>
+                  </div>
+                  <div style={{ padding: '8px 20px' }}>
+                    {CALENDAR_EVENTS.map((evt, i) => {
+                      const urgencyColor = evt.urgency === 'critical' ? '#B04A28' : evt.urgency === 'high' ? '#C8973F' : evt.urgency === 'medium' ? '#5C7A8A' : '#6B5E4D';
+                      const daysUntil = Math.ceil((new Date(evt.date) - new Date('2026-05-01')) / (1000*60*60*24));
+                      return (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < CALENDAR_EVENTS.length - 1 ? '1px solid #F0EDE8' : 'none', cursor: 'pointer' }}
+                          onClick={() => { setExpandedOpp(evt.oppId); setActiveTab('overview'); window.scrollTo({ top: 400, behavior: 'smooth' }); }}>
+                          <div style={{ width: 3, height: 24, borderRadius: 2, background: urgencyColor, flexShrink: 0 }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 11, fontWeight: 500, color: '#1F1A14', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{evt.program}</div>
+                            <div className="tabular-nums" style={{ fontSize: 10, color: '#6B5E4D' }}>{new Date(evt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                          </div>
+                          <div className="tabular-nums" style={{ fontSize: 11, fontWeight: 600, color: urgencyColor, flexShrink: 0 }}>
+                            {daysUntil}d
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── EXPANSION MODULES ──────────────────────── */}
+            <div style={{ marginTop: 8, marginBottom: 24 }}>
+              <div className="font-serif" style={{ fontSize: 12, fontWeight: 600, color: '#3D2817', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Expansion Modules</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+                {[
+                  { icon: <Icons.Truck size={20} color="#6B5E4D" />, name: 'Trailer & Drying Logistics ADE', desc: 'Tracks ~100 peanut trailers from field to dryer, monitors moisture by load, prevents variety co-mingling', phase: 'Coming online: Phase 2',
+                    bullets: ['GPS tracking and moisture telemetry for all trailer movements from field to dryer facility', 'Automated variety segregation — prevents Bailey II / Sullivan / Walton co-mingling across loads', 'Real-time dryer queue optimization based on moisture content and variety priority'] },
+                  { icon: <Icons.Droplet size={20} color="#6B5E4D" />, name: 'Spray & Compliance Records ADE', desc: 'Maintains EPA/VDACS-compliant pesticide application logs and chemigation records', phase: 'Coming online: Phase 2',
+                    bullets: ['Automated EPA/VDACS pesticide application logging with applicator license verification', 'Chemigation record maintenance tied to specific field blocks and application windows', 'Pre-populated Worker Protection Standard compliance documentation for audits'] },
+                  { icon: <Icons.DollarSign size={20} color="#6B5E4D" />, name: 'AR / AP Reconciliation ADE', desc: 'Processes invoices from retailers, distributors, and input suppliers; reconciles to QuickBooks', phase: 'Available — request quote',
+                    bullets: ['Ingests retailer POs and distributor invoices — matches to shipment records automatically', 'Input supplier invoice processing with purchase order cross-reference and variance flagging', 'Direct QuickBooks Online sync with automated category mapping and month-end reconciliation'] },
+                  { icon: <Icons.Users size={20} color="#6B5E4D" />, name: 'Payroll & Labor Scheduling ADE', desc: 'Manages H-2A and domestic farm payroll, schedules harvest crews against weather windows', phase: 'Available — request quote',
+                    bullets: ['H-2A and domestic worker payroll processing with prevailing wage rate compliance', 'Harvest crew scheduling optimized against 10-day weather forecasts and field readiness', 'DOL audit-ready record keeping — housing, transportation, and wage documentation'] },
+                ].map((mod, i) => (
+                  <div key={i} className="expansion-tile" onClick={() => setExpandedModule(expandedModule === i ? null : i)}>
+                    <div style={{ marginBottom: 12 }}>{mod.icon}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#3D2817', marginBottom: 6 }}>{mod.name}</div>
+                    <div style={{ fontSize: 11, color: '#6B5E4D', lineHeight: 1.5, marginBottom: 12 }}>{mod.desc}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#A09585' }}>
+                      <Icons.Lock size={10} color="#A09585" />
+                      {mod.phase}
+                    </div>
+                    <div style={{ marginTop: 8 }}>
+                      <span style={{ fontSize: 11, color: '#C8973F', fontWeight: 500, cursor: 'pointer' }}>Learn more</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Expansion Module Modal */}
+              {expandedModule !== null && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(31,26,20,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setExpandedModule(null)}>
+                  <div className="fade-in" style={{ background: '#FFFFFF', borderRadius: 12, padding: '32px', maxWidth: 520, width: '90%', border: '1px solid #EDE6D9' }} onClick={e => e.stopPropagation()}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                      <div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: '#3D2817' }}>
+                          {['Trailer & Drying Logistics ADE', 'Spray & Compliance Records ADE', 'AR / AP Reconciliation ADE', 'Payroll & Labor Scheduling ADE'][expandedModule]}
+                        </div>
+                        <div style={{ fontSize: 11, color: '#6B5E4D', marginTop: 4 }}>Neuralogic Autonomous Digital Employee</div>
+                      </div>
+                      <div style={{ cursor: 'pointer', padding: 4 }} onClick={() => setExpandedModule(null)}>
+                        <Icons.X size={18} color="#6B5E4D" />
+                      </div>
+                    </div>
+
+                    <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Build Scope</div>
+                    {[
+                      [
+                        'GPS tracking and moisture telemetry for all trailer movements from field to dryer facility',
+                        'Automated variety segregation — prevents Bailey II / Sullivan / Walton co-mingling across loads',
+                        'Real-time dryer queue optimization based on moisture content and variety priority',
+                      ],
+                      [
+                        'Automated EPA/VDACS pesticide application logging with applicator license verification',
+                        'Chemigation record maintenance tied to specific field blocks and application windows',
+                        'Pre-populated Worker Protection Standard compliance documentation for audits',
+                      ],
+                      [
+                        'Ingests retailer POs and distributor invoices — matches to shipment records automatically',
+                        'Input supplier invoice processing with purchase order cross-reference and variance flagging',
+                        'Direct QuickBooks Online sync with automated category mapping and month-end reconciliation',
+                      ],
+                      [
+                        'H-2A and domestic worker payroll processing with prevailing wage rate compliance',
+                        'Harvest crew scheduling optimized against 10-day weather forecasts and field readiness',
+                        'DOL audit-ready record keeping — housing, transportation, and wage documentation',
+                      ],
+                    ][expandedModule].map((bullet, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 8, padding: '6px 0' }}>
+                        <Icons.ChevronRight size={12} color="#C8973F" style={{ marginTop: 2, flexShrink: 0 }} />
+                        <span style={{ fontSize: 12, color: '#1F1A14', lineHeight: 1.5 }}>{bullet}</span>
+                      </div>
+                    ))}
+
+                    <div style={{ marginTop: 24, padding: '16px 20px', background: '#FAF8F4', borderRadius: 8, border: '1px solid #EDE6D9' }}>
+                      <div style={{ fontSize: 10, color: '#6B5E4D', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Standard Pricing</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <span style={{ fontSize: 12, color: '#1F1A14' }}>Platform License</span>
+                        <span className="tabular-nums" style={{ fontSize: 12, fontWeight: 600, color: '#1F1A14' }}>$5,000/mo</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <span style={{ fontSize: 12, color: '#1F1A14' }}>ADE Build & Operation</span>
+                        <span className="tabular-nums" style={{ fontSize: 12, fontWeight: 600, color: '#1F1A14' }}>$2,250/mo</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 12, color: '#1F1A14' }}>Cloud Infrastructure</span>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: '#6B5E4D' }}>At cost (pass-through)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── FOOTER ─────────────────────────────────────── */}
+          <footer style={{ height: 40, borderTop: '1px solid #EDE6D9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', background: '#FFFFFF' }}>
+            <div style={{ fontSize: 10, color: '#A09585' }}>Built by Neuralogic Group · Single-tenant · Hosted on AWS US-East-1 · SOC 2 Type II Track</div>
+            <div style={{ fontSize: 10, color: '#A09585', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span className="tabular-nums">Build version 0.4.2 (LRP) · Last deploy: today</span>
+              <span style={{ color: '#C8973F', cursor: 'pointer', fontWeight: 500 }}>Console</span>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<HopeHarmonyADE />);
+  </script>
+</body>
+</html>
